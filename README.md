@@ -6,7 +6,6 @@ This is a web app to control a server instance of
 [`cmus`](https://cmus.github.io/), a powerful music player, remotely. It only
 supports basic player and volume controls, not adding items to the playlist. 
 
-![Screenshot of cmus_app running in Firefox](cmus-app-screenshot.png)
 
 ## Dependencies
 

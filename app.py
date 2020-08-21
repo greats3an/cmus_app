@@ -127,5 +127,5 @@ if __name__ == '__main__':
     settings = vars(options)
     Remote = RemoteClass()
 
-    print("Bottle is now listening on http://%s:%d/\n" % (settings['app_host'], settings['app_port']))
+    print("Bottle is now listening on http://%s:%s/\n" % (settings['app_host'], settings['app_port']))
     run(host=settings['app_host'], port=int(settings['app_port']),quiet=True)
