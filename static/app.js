@@ -3,7 +3,7 @@ function parseTime(s) {
 }
 function runCommand(command) {
     $.ajax({
-        type: 'POST', url: '/cmd', data: { command: command }, context: $("div#result"),
+        type: 'POST', url: 'cmd', data: { command: command }, context: $("div#result"),
         error: function () {
             var msg = '<p class="red label"><i class="icon-remove"></i> ' + command + '</p>';
             this.html(msg)
@@ -16,7 +16,7 @@ function runCommand(command) {
 }
 function updateStatus() {
     $.ajax({
-        url: '/status', dataType: 'json', context: $("div#status"),
+        url: 'status', dataType: 'json', context: $("div#status"),
         error: function () {
             var msg = '<p class="error">Connection to <code>cmus</code> cannot be established.</p>';
             this.html(msg)
