@@ -1,7 +1,5 @@
 [![AGPL](https://img.shields.io/badge/license-AGPL-blue.svg)](https://raw.githubusercontent.com/jboynyc/cmus_app/master/LICENSE)
 
-**This repository is in retirement. You may want to check out [this fork](https://github.com/ichier/cmus_app) of `cmus_app` instead.**
-
 # cmus-remote web app
 
 This is a web app to control a server instance of
@@ -13,14 +11,13 @@ supports basic player and volume controls, not adding items to the playlist.
 ## Dependencies
 
 `cmus` is required, of course. The backend is written in Python and has been
-tested with Python 2.7, Python 3.5, PyPy 4.0, and Pyston 0.4.
+tested with Python 3.8 (Python 3 variants should work)
 
-All dependencies are bundled. They are [`bottle`](http://bottlepy.org) and
-[`sh`](http://amoffat.github.com/sh/). The frontend also makes use of
-[Zepto](http://zeptojs.com/), [Kube](http://imperavi.com/kube), and [Font
+All frontend dependencies are bundled:[Zepto](http://zeptojs.com/), [Kube](http://imperavi.com/kube), and [Font
 Awesome](http://fortawesome.github.com/Font-Awesome/). Thanks to the creators
 for making them available under permissive licenses. 
 
+[`bottle`](http://bottlepy.org) needs to be manually installed though
 ## Instructions
 
 The web app can run on the same host as the `cmus` instance you want to control
@@ -28,11 +25,7 @@ or a different one, but both hosts will have to have `cmus` installed.
 
 ### On the cmus host
 
-- Run an instance of `cmus` using the `--listen` option.
-
-        $ cmus --listen <host>
-
-- Set a password in `cmus` using `:set passwd=<passwd>`.
+Just run it without `--listen` argument
 
 ### On the web app host
 
