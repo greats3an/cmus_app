@@ -1,5 +1,0 @@
-[cmus_app]
-cmus_host = raspberry ;host running cmus (with --listen <host>)
-cmus_passwd = PaSsWd  ;cmus password (use :set passwd=<passwd>)
-app_host = localhost  ;host running web app
-app_port = 8080       ;port for web app

@@ -16,12 +16,33 @@ https://github.com/jboynyc/cmus_app
 
 
 from optparse import OptionParser
-try:
-    from configparser import ConfigParser
-except ImportError:
-    from ConfigParser import SafeConfigParser as ConfigParser
+from re import sub
+from typing import DefaultDict
 from bottle import abort, post, request, response, route, run, view, static_file
-from sh import cmus_remote, ErrorReturnCode_1
+import subprocess
+
+hostname = subprocess.run('hostname', capture_output=True)
+hostname = hostname.stdout.decode()
+
+class NoConnectionError(Exception):
+    '''Raised when falied to connect to cmus'''
+    pass
+
+
+class RemoteClass:
+
+    def __call__(self, *args):
+        process = subprocess.run(['cmus-remote', *args], capture_output=True)
+        assert process.returncode == 0
+        return process
+
+    def __init__(self) -> None:
+        # Check if is cmus alive
+        try:
+            self.__call__('-Q')
+        except:
+            raise NoConnectionError(
+                "Unable to establish connection to cmus via UNIX socket")
 
 
 class ConfigFileNotFound(IOError):
@@ -34,46 +55,31 @@ class MissingSetting(Exception):
     pass
 
 
-def read_config(config_file):
-    r = {}
-    try:
-        config_parser = ConfigParser(inline_comment_prefixes=';')
-    except TypeError:
-        config_parser = ConfigParser()
-    n = config_parser.read(config_file)
-    if not len(n):
-        raise ConfigFileNotFound(config_file)
-    section = 'cmus_app'
-    fields = ['cmus_host', 'cmus_passwd', 'app_host', 'app_port']
-    for field in fields:
-        try:
-            r[field] = config_parser.get(section, field)
-        except:
-            raise MissingSetting(field)
-    return r
-
-
 @route('/')
 @view('main')
 def index():
-    return {'host': settings['cmus_host']}
+    return {'host': hostname}
 
 
 @post('/cmd')
 def run_command():
     legal_commands = {'Play': 'player-play',
-                      'Stop': 'player-stop',
+                      'Pause': 'player-pause',
                       'Next': 'player-next',
                       'Previous': 'player-prev',
-                      'Increase Volume': 'vol +1%',
-                      'Reduce Volume': 'vol -1%',
-                      'Mute': 'vol 0'}
+                      'Increase Volume': 'vol +10%',
+                      'Reduce Volume': 'vol -10%',
+                      'Mute': 'vol 0',
+                      'Step -5s': 'seek -5',
+                      'Step +5s': 'seek +5',
+                      'Toggle Shuffle' : 'toggle shuffle'
+                      }
     command = request.POST.get('command', default=None)
     if command in legal_commands:
         try:
             out = Remote('-C', legal_commands[command])
-            return {'result': out.exit_code, 'output': out.stdout.decode()}
-        except ErrorReturnCode_1:
+            return {'result': out.returncode, 'output': out.stdout.decode()}
+        except NoConnectionError:
             abort(503, 'Cmus not running.')
     else:
         abort(400, 'Invalid command.')
@@ -82,20 +88,18 @@ def run_command():
 @route('/status')
 def get_status():
     try:
-        out = Remote('-Q').stdout.decode().split('\n')
-        r = {}
-        play = out[0].split()[1]
-        if play == 'playing':
-            r['playing'] = True
-        elif play == 'stopped':
-            r['playing'] = False
-        info = [i for i in out if i.startswith(('tag', 'set'))]
-        for i in info:
-            k, v = i.split()[1], i.split()[2:]
-            if len(v):
-                r[k] = ' '.join(v)
-        return r
-    except ErrorReturnCode_1:
+        process = subprocess.run(['cmus-remote', '-Q'], capture_output=True)
+        if not process.returncode == 0:
+            return {}
+        else:
+            result = DefaultDict(list)
+            for k, v in [(l[:l.index(' ')], l[l.index(' ') + 1:]) for l in process.stdout.decode().split('\n') if ' ' in l]:
+                result[k].append(v)
+            for k in ['tag', 'set']:
+                result[k] = {s.split(' ')[0]: s[len(
+                    s.split(' ')[0]) + 1:] for s in result[k]}
+            return result
+    except NoConnectionError:
         abort(503, 'Cmus not running.')
 
 
@@ -113,14 +117,6 @@ def favicon():
 
 if __name__ == '__main__':
     option_parser = OptionParser()
-    option_parser.add_option('-f', '--config', dest='config_file',
-                             help='Location of configuration file.')
-    option_parser.add_option('-c', '--cmus-host', dest='cmus_host',
-                             help='Name of cmus host.',
-                             default='localhost')
-    option_parser.add_option('-w', '--cmus-passwd', dest='cmus_passwd',
-                             help='Cmus password.',
-                             default='')
     option_parser.add_option('-a', '--app-host', dest='app_host',
                              help='Name of cmus_app host.',
                              default='localhost')
@@ -128,10 +124,8 @@ if __name__ == '__main__':
                              help='Port cmus_app is listening on.',
                              default=8080)
     options, _ = option_parser.parse_args()
-    if options.config_file:
-        settings = read_config(options.config_file)
-    else:
-        settings = vars(options)
-    Remote = cmus_remote.bake(['--server', settings['cmus_host'],
-                               '--passwd', settings['cmus_passwd']])
-    run(host=settings['app_host'], port=settings['app_port'])
+    settings = vars(options)
+    Remote = RemoteClass()
+
+    print("Bottle is now listening on http://%s:%d/\n" % (settings['app_host'], settings['app_port']))
+    run(host=settings['app_host'], port=settings['app_port'],quiet=True)

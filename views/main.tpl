@@ -56,6 +56,13 @@
         #result {
             min-height: 2em;
         }
+        progress {
+            display: inline-block;
+            margin: 0 1em;
+            line-height: 1em;
+            padding: .5em 0 .5em 0;
+            width:80%;
+        }
         footer { position: fixed; bottom: 1ex; }
     </style>
 </head>
@@ -68,8 +75,10 @@
 
     <span class="btn-group">
         <button class="cmd-btn btn" title="Previous"><i class="icon-fast-backward"></i></button>
+        <button class="cmd-btn btn" title="Step -5s"><i class="icon-backward"></i></button>
         <button class="cmd-btn btn" title="Play"><i class="icon-play"></i></button>
-        <button class="cmd-btn btn" title="Stop"><i class="icon-stop"></i></button>
+        <button class="cmd-btn btn" title="Pause"><i class="icon-pause"></i></button>
+        <button class="cmd-btn btn" title="Step +5s"><i class="icon-forward"></i></button>
         <button class="cmd-btn btn" title="Next"><i class="icon-fast-forward"></i></button>
     </span>
 
@@ -79,7 +88,9 @@
         <button class="cmd-btn btn" title="Increase Volume"><i class="icon-volume-up"></i></button>
     </span>
 
-    <button class="status-btn btn btn-round" title="Update Status"><i class="icon-info-sign"></i></button>
+    <span class="btn-group">
+        <button class="cmd-btn btn" title="Toggle Shuffle"><i class="icon-random"></i></button>
+    </span>
 
 </div>
 
@@ -91,62 +102,6 @@
 
 </div>
 <script src="/static/zepto.min.js"></script>
-<script type="text/javascript">
-    function runCommand(command){
-        $.ajax({type: 'POST', url: '/cmd', data: {command: command}, context: $("div#result"),
-            error: function(){
-                var msg = '<p class="red label"><i class="icon-remove"></i> ' + command + '</p>';
-                this.html(msg)
-            },
-            success: function(){
-                var msg = '<p class="green label"><i class="icon-ok"></i> ' + command + '</p>'
-                this.html(msg)
-            }})
-    }
-    function updateStatus(){
-        $.ajax({url: '/status', dataType: 'json', context: $("div#status"), 
-            error: function(){
-                var msg = '<p class="error">Connection to <code>cmus</code> cannot be established.</p>';
-                this.html(msg)
-            },
-            success: function(response){
-                if (response.playing == true) {var msg = '<p>'}
-                if (response.playing == false) {var msg = '<p class="gray">'}
-                if (response.artist != null & response.title != null & response.album != null & response.date != null)
-                    {msg += response.artist + ': <strong>' + response.title + '</strong> (' + response.album + ', ' + response.date.substring(0,4) + ')'}
-                else if (response.artist != null & response.title != null & response.album != null)
-                    {msg += response.artist + ': <strong>' + response.title + '</strong> (' + response.album + ')'}
-                else if (response.artist != null & response.title != null & response.date != null)
-                    {msg += response.artist + ': <strong>' + response.title + '</strong> (' + response.date.substring(0,4) + ')'}
-                else if (response.artist != null & response.title != null)
-                    {msg += response.artist + ': <strong>' + response.title + '</strong>'}
-                else if (response.title != null)
-                    {msg += '<strong>' + response.title + '</strong>'}
-                else if (response.artist != null)
-                    {msg += response.artist + ': <strong>(unknown)</strong>'}
-                else {msg += '<em>none/unknown</em>'}
-                msg += '</p><span class="vol gray">';
-                if (response.vol_left != null) {msg += response.vol_left}
-                if (response.shuffle == 'true') {msg += ' <i class="icon-random"></i>'}
-                if (response.repeat == 'true') {msg += ' <i class="icon-refresh"></i>'}
-                msg += '</span>';
-                this.html(msg)
-            }})
-    }
-    $(".status-btn").on('click', (function() {
-        updateStatus()
-    }))
-    $(".cmd-btn").on('click', (function(){
-        var cmd = $(this).attr('title');
-        runCommand(cmd);
-        updateStatus();
-    }))
-    $("div#result").on('click', (function(){
-        $(this).empty()
-    }))
-    Zepto(function() {
-        updateStatus()
-    })
-</script>
+<script src="/static/app.js"></script>
 </body>
 </html>
