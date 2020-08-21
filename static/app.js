@@ -1,3 +1,6 @@
+function parseTime(s) {
+    return new Date(s * 1000).toISOString().substr(14,5)
+}
 function runCommand(command) {
     $.ajax({
         type: 'POST', url: '/cmd', data: { command: command }, context: $("div#result"),
@@ -43,6 +46,7 @@ function updateStatus() {
             if (response.set.repeat == 'true') { msg += ' <i class="icon-refresh"></i>' }
             msg += '</span></br>';
             msg += '<progress max="' + response.duration[0] + '" value="' + response.position[0] + '"></progress>';
+            msg += parseTime(response.position[0]) + ' / ' + parseTime(response.duration[0])
             this.html(msg)
         }
     })

@@ -4,8 +4,8 @@
     <title>cmus on {{host}}</title>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="/static/kube.min.css"/>
-    <link rel="stylesheet" type="text/css" href="/static/font-awesome.min.css"/>
+    <link rel="stylesheet" type="text/css" href="static/kube.min.css"/>
+    <link rel="stylesheet" type="text/css" href="static/font-awesome.min.css"/>
     <style type="text/css">
         .wrapper {
             width: 940px;
@@ -69,6 +69,8 @@
 <body>
 <div class="wrapper">
 
+<h1>Grooving over {{host}}</h1></br>
+
 <div id="status"></div>
 
 <div class="controls">
@@ -101,7 +103,7 @@
 </footer>
 
 </div>
-<script src="/static/zepto.min.js"></script>
-<script src="/static/app.js"></script>
+<script src="static/zepto.min.js"></script>
+<script src="static/app.js"></script>
 </body>
 </html>
