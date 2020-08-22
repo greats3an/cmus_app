@@ -37,7 +37,7 @@ Just run it without `--listen` argument
 - Run the app with a configuration file or command-line options:
 
         $ python app.py -f <config_file>
-        $ python app.py -c raspberry -w PaSsWd -a localhost -p 8080
+        $ python app.py --welcome "The Groovbox" -a localhost -p 8080
 
 ### Anywhere on your network
 
