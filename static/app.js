@@ -22,7 +22,13 @@ function updateStatus() {
             this.html(msg)
         },
         success: function (response) {
-            if (response.status[0] == "playing") { var msg = '<p>' } else { var msg = '<p class="gray">' }
+            if (response.status[0] == "playing") {
+                var msg = '<p>' 
+                $('#player')[0].play()
+            } else {
+                var msg = '<p class="gray">'
+                $('#player')[0].pause()
+            }
             mask = (response.tag.artist != null)  << 3 | (response.tag.title != null) << 2 | (response.tag.album != null) << 1 | (response.tag.date != null) << 0
             switch (mask) {
                 case parseInt(1111, 2): // artist,title,album,date
@@ -54,6 +60,8 @@ function updateStatus() {
             }
             if(Math.abs($('#player')[0].currentTime - response.position[0]) > 5)$('#player')[0].currentTime = response.position[0] 
             // sync up when time delta > 5s
+            $('#player')[0].volume = response.set.vol_left / 100
+            // sync volume
             this.html(msg)
         }
     })
