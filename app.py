@@ -66,7 +66,7 @@ def audio(file):
 @route('/')
 @view('main')
 def index():
-    return {'host': hostname}
+    return {'host': hostname,'welcome':settings['welcome']}
 
 @post('/cmd')
 def run_command():
@@ -132,10 +132,13 @@ if __name__ == '__main__':
                              default=8080)
     option_parser.add_option('--disable-streaming',dest='disable_streaming',
                              help='Disable internal streaming',
-                             action='store_true')                             
+                             action='store_true')                
+    option_parser.add_option('--welcome',dest='welcome',
+                             help='Welcome Message',
+                             default='Hello there')                                                 
     options, _ = option_parser.parse_args()
     settings = vars(options)
     Remote = RemoteClass()
 
     print("Bottle is now listening on http://%s:%s/\n" % (settings['app_host'], settings['app_port']))
-    run(host=settings['app_host'], port=int(settings['app_port']),quiet=True)
+    run(host=settings['app_host'], port=int(settings['app_port']),server='auto')

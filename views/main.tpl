@@ -69,7 +69,7 @@
 <body>
 <div class="wrapper">
 
-<h1>Grooving over {{host}}</h1></br>
+<h1>{{welcome}}</h1></br>
 
 <div id="status"></div>
 
