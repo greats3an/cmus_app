@@ -97,7 +97,7 @@
 </div>
 
 <div id="result"></div>
-
+<audio id="player" autoplay></div>
 <footer>
     <p class="small gray-light"><i class="icon-play-circle"></i> This is <code>cmus</code> running on {{host}}.</p>
 </footer>

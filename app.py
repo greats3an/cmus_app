@@ -55,11 +55,18 @@ class MissingSetting(Exception):
     pass
 
 
+@route('/audio/<file>')
+def audio(file):
+    if settings['disable_streaming']:
+        print('Streaming is disabled')
+        return {}
+    file = file.replace('|','/')
+    print('Requesting local file',file)
+    return static_file(file,'/')
 @route('/')
 @view('main')
 def index():
     return {'host': hostname}
-
 
 @post('/cmd')
 def run_command():
@@ -123,6 +130,9 @@ if __name__ == '__main__':
     option_parser.add_option('-p', '--app-port', dest='app_port',
                              help='Port cmus_app is listening on.',
                              default=8080)
+    option_parser.add_option('--disable-streaming',dest='disable_streaming',
+                             help='Disable internal streaming',
+                             action='store_true')                             
     options, _ = option_parser.parse_args()
     settings = vars(options)
     Remote = RemoteClass()

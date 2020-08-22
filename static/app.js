@@ -47,6 +47,13 @@ function updateStatus() {
             msg += '</span></br>';
             msg += '<progress max="' + response.duration[0] + '" value="' + response.position[0] + '"></progress>';
             msg += parseTime(response.position[0]) + ' / ' + parseTime(response.duration[0])
+            if ($('#player')[0].file != response.file[0]){
+                // updates file
+                $('#player')[0].file = response.file[0]
+                $('#player')[0].src = 'audio/' + response.file[0].replace(/\//g,'|')
+            }
+            if(Math.abs($('#player')[0].currentTime - response.position[0]) > 5)$('#player')[0].currentTime = response.position[0] 
+            // sync up when time delta > 5s
             this.html(msg)
         }
     })
