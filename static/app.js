@@ -1,3 +1,6 @@
+function clamp(num, min, max) {
+    return num <= min ? min : num >= max ? max : num;
+}
 function parseTime(s) {
     return new Date(s * 1000).toISOString().substr(14,5)
 }
@@ -54,13 +57,13 @@ function updateStatus() {
             msg += '<progress max="' + response.duration[0] + '" value="' + response.position[0] + '"></progress>';
             msg += parseTime(response.position[0]) + ' / ' + parseTime(response.duration[0])
             if ($('#player')[0].file != response.file[0]){
-                // updates file
-                $('#player')[0].file = response.file[0]
+                // updates file                
                 $('#player')[0].src = 'audio/' + response.file[0].replace(/\//g,'|')
+                $('#player')[0].file = response.file[0]
             }
             if(Math.abs($('#player')[0].currentTime - response.position[0]) > 5)$('#player')[0].currentTime = response.position[0] 
             // sync up when time delta > 5s
-            $('#player')[0].volume = response.set.vol_left / 100
+            $('#player')[0].volume = clamp(response.set.vol_left / 100,0,1)
             // sync volume
             this.html(msg)
         }
