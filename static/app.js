@@ -78,3 +78,4 @@ $("div#result").on('click', (function () {
     $(this).empty()
 }))
 setInterval(updateStatus, 1000) // update per sec
+$('#warning').on('click',function () { this.style.display='none' } ) // close on click

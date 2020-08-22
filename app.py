@@ -24,6 +24,7 @@ import subprocess
 hostname = subprocess.run('hostname', capture_output=True)
 hostname = hostname.stdout.decode()
 
+
 class NoConnectionError(Exception):
     '''Raised when falied to connect to cmus'''
     pass
@@ -60,27 +61,31 @@ def audio(file):
     if settings['disable_streaming']:
         print('Streaming is disabled')
         return {}
-    file = file.replace('|','/')
-    print('Requesting local file',file)
-    return static_file(file,'/')
+    file = file.replace('|', '/')
+    print('Requesting local file', file)
+    return static_file(file, '/')
+
+
 @route('/')
 @view('main')
 def index():
-    return {'host': hostname,'welcome':settings['welcome']}
+    return {'host': hostname, 'enable_warning': ['none', 'block'][len(settings['warning']) > 0], **settings}
+
 
 @post('/cmd')
 def run_command():
-    legal_commands = {'Play': 'player-play',
-                      'Pause': 'player-pause',
-                      'Next': 'player-next',
-                      'Previous': 'player-prev',
-                      'Increase Volume': 'vol +10%',
-                      'Reduce Volume': 'vol -10%',
-                      'Mute': 'vol 0',
-                      'Step -5s': 'seek -5',
-                      'Step +5s': 'seek +5',
-                      'Toggle Shuffle' : 'toggle shuffle'
-                      }
+    legal_commands = {
+        'Play': 'player-play',
+        'Pause': 'player-pause',
+        'Next': 'player-next',
+        'Previous': 'player-prev',
+        'Increase Volume': 'vol +10%',
+        'Reduce Volume': 'vol -10%',
+        'Mute': 'vol 0',
+        'Step -5s': 'seek -5',
+        'Step +5s': 'seek +5',
+        'Toggle Shuffle': 'toggle shuffle'
+    }
     command = request.POST.get('command', default=None)
     if command in legal_commands:
         try:
@@ -130,15 +135,20 @@ if __name__ == '__main__':
     option_parser.add_option('-p', '--app-port', dest='app_port',
                              help='Port cmus_app is listening on.',
                              default=8080)
-    option_parser.add_option('--disable-streaming',dest='disable_streaming',
+    option_parser.add_option('--disable-streaming', dest='disable_streaming',
                              help='Disable internal streaming',
-                             action='store_true')                
-    option_parser.add_option('--welcome',dest='welcome',
+                             action='store_true')
+    option_parser.add_option('--welcome', dest='welcome',
                              help='Welcome Message',
-                             default='Hello there')                                                 
+                             default='Hello there')
+    option_parser.add_option('--warning', dest='warning',
+                             help='Warning Message',
+                             default='')
     options, _ = option_parser.parse_args()
     settings = vars(options)
     Remote = RemoteClass()
 
-    print("Bottle is now listening on http://%s:%s/\n" % (settings['app_host'], settings['app_port']))
-    run(host=settings['app_host'], port=int(settings['app_port']),server='auto')
+    print("Bottle is now listening on http://%s:%s/\n" %
+          (settings['app_host'], settings['app_port']))
+    run(host=settings['app_host'], port=int(
+        settings['app_port']), server='auto')
