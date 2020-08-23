@@ -47,7 +47,7 @@ function updateStatus() {
                 case parseInt(1000, 2): // artist
                     msg += response.tag.artist + ': <strong>(unknown)</strong>'; break
                 default:                // none
-                    msg += '<em>none/unknown</em>'
+                    msg += '<em>' + response.file[0] + '</em>'
             }
             msg += '</p><span class="vol gray">';
             if (response.set.vol_left != null) { msg += response.set.vol_left }
